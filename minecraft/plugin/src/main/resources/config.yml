@@ -17,6 +17,9 @@ shop-feed-seconds: 10
 # Skip posting batches worth less than this. Set very high to turn the feed off.
 shop-feed-min-dollars: 10.00
 
+# Post new /market listings and purchases in chat.
+announce-market: true
+
 # Say in chat how many more people need to sleep when someone gets in bed.
 announce-sleep: true
 

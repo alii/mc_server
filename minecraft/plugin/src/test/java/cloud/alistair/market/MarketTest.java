@@ -101,4 +101,42 @@ class MarketTest extends PluginTest {
         run(b, "market");
         assertTrue(click(b, 49, ClickType.LEFT).isCancelled());
     }
+
+    @Test
+    void listingsAreAnnounced() {
+        PlayerMock watcher = player("alex");
+        listSword("steve", "50");
+        assertTrue(saidAll(watcher).contains("steve listed 1× diamond sword for $50.00"));
+    }
+
+    @Test
+    void purchasesAreAnnounced() {
+        listSword("steve", "50");
+        PlayerMock b = player("alex");
+        setBalance(b, 100_00);
+        PlayerMock watcher = player("sam");
+        run(b, "market");
+        click(b, slotOf(b, Material.DIAMOND_SWORD), ClickType.LEFT);
+        assertTrue(saidAll(watcher).contains("alex bought 1× diamond sword from steve for $50.00"));
+    }
+
+    @Test
+    void takingBackIsQuiet() {
+        PlayerMock s = listSword("steve", "50");
+        PlayerMock watcher = player("alex");
+        run(s, "market mine");
+        click(s, slotOf(s, Material.DIAMOND_SWORD), ClickType.LEFT);
+        assertTrue(saidAll(watcher).isEmpty());
+    }
+
+    @Test
+    void renamedItemsCantInjectFormatting() {
+        PlayerMock watcher = player("alex");
+        PlayerMock s = player("steve");
+        ItemStack named = new ItemStack(Material.DIAMOND_SWORD);
+        named.editMeta(m -> m.displayName(net.kyori.adventure.text.Component.text("<red>free money</red>")));
+        s.getInventory().setItemInMainHand(named);
+        run(s, "market sell 5");
+        assertTrue(saidAll(watcher).contains("<red>free money</red>"));
+    }
 }

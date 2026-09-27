@@ -86,6 +86,9 @@ public final class MarketMenu implements TabExecutor, Listener {
         Msg.ok(p, "Listed <white><n>× <i></white> for <green><m></green>. Seller fee on sale: <f>%.",
                 Msg.v("n", String.valueOf(hand.getAmount())), Msg.v("i", itemName(hand)),
                 Msg.v("m", Money.format(price.getAsLong())), Msg.v("f", String.valueOf(plugin.settings().marketFeePercent())));
+        announce("<white><p></white> listed <white><n>× <i></white> for <green><m></green> <dark_gray>· /market",
+                Msg.v("p", p.getName()), Msg.v("n", String.valueOf(hand.getAmount())), Msg.v("i", itemName(hand)),
+                Msg.v("m", Money.format(price.getAsLong())));
     }
 
     private void open(Player p, Mode mode, int page) {
@@ -169,11 +172,21 @@ public final class MarketMenu implements TabExecutor, Listener {
         EconomyCommands.give(p, item);
         Msg.ok(p, "Bought <white><n>× <i></white> for <green><m></green>.",
                 Msg.v("n", String.valueOf(item.getAmount())), Msg.v("i", itemName(item)), Msg.v("m", Money.format(l.priceCents())));
+        announce("<white><p></white> bought <white><n>× <i></white> from <white><s></white> for <green><m></green>",
+                Msg.v("p", p.getName()), Msg.v("n", String.valueOf(item.getAmount())), Msg.v("i", itemName(item)),
+                Msg.v("s", l.sellerName()), Msg.v("m", Money.format(l.priceCents())));
         Player seller = Bukkit.getPlayer(l.seller());
         if (seller != null) {
             Msg.ok(seller, "<white><p></white> bought your <white><i></white>. You got <green><m></green>.",
                     Msg.v("p", p.getName()), Msg.v("i", itemName(item)), Msg.v("m", Money.format(l.priceCents() - fee)));
         }
+    }
+
+    /** Item names can be renamed by players, so they only ever go in as placeholders. */
+    private void announce(String template, net.kyori.adventure.text.minimessage.tag.resolver.TagResolver... tags) {
+        if (!plugin.settings().announceMarket()) return;
+        plugin.getServer().broadcast(Msg.mm(
+                "<dark_gray>[<gradient:#b86bff:#ff6bd6>market</gradient>]</dark_gray> <gray>" + template, tags));
     }
 
     static ItemStack button(Material m, String name, String... lore) {

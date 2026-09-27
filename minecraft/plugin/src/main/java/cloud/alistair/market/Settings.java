@@ -28,7 +28,8 @@ public record Settings(
         List<String> tips,
         int shopFeedSeconds,
         long shopFeedMinCents,
-        boolean announceSleep) {
+        boolean announceSleep,
+        boolean announceMarket) {
 
     public static Settings from(FileConfiguration c) {
         return new Settings(
@@ -49,7 +50,8 @@ public record Settings(
                 List.copyOf(c.getStringList("tips")),
                 c.getInt("shop-feed-seconds"),
                 Math.round(c.getDouble("shop-feed-min-dollars") * 100),
-                c.getBoolean("announce-sleep"));
+                c.getBoolean("announce-sleep"),
+                c.getBoolean("announce-market"));
     }
 
     /** Ticker to icon, in config order. Unknown items fall back to paper. */
