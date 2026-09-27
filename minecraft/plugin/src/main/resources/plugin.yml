@@ -1,8 +1,8 @@
-name: NetheriteMarket
+name: SmpPlugin
 version: ${version}
 main: cloud.alistair.market.MarketPlugin
 api-version: '26.2'
-description: Economy, server shop, player market, and real stock prices.
+description: Everything custom on the SMP. Economy, shop, player market, and real stock prices.
 author: alii
 
 commands:
@@ -30,8 +30,11 @@ commands:
     aliases: [ah]
   eco:
     description: Admin money tools.
-    permission: netherite.admin
+    permission: smp.admin
+  smp:
+    description: Admin tools. /smp reload re-reads config.yml and shop.yml.
+    permission: smp.admin
 
 permissions:
-  netherite.admin:
+  smp.admin:
     default: op

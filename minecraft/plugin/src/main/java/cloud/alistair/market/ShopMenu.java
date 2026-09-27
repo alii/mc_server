@@ -43,12 +43,18 @@ public final class ShopMenu implements TabExecutor, Listener {
     }
 
     private final MarketPlugin plugin;
-    private final ShopCatalog catalog;
     private final java.util.Map<java.util.UUID, Long> pendingSellAll = new java.util.HashMap<>();
 
-    public ShopMenu(MarketPlugin plugin, ShopCatalog catalog) {
+    public ShopMenu(MarketPlugin plugin) {
         this.plugin = plugin;
-        this.catalog = catalog;
+    }
+
+    /** Open menus point at categories by index, which a reload can shift. */
+    public static void closeAll(org.bukkit.Server server) {
+        for (Player p : server.getOnlinePlayers()) {
+            Inventory top = p.getOpenInventory().getTopInventory();
+            if (top != null && top.getHolder() instanceof View) p.closeInventory();
+        }
     }
 
     // --- pricing ---
@@ -135,7 +141,7 @@ public final class ShopMenu implements TabExecutor, Listener {
 
     private void worth(Player p) {
         ItemStack hand = p.getInventory().getItemInMainHand();
-        ShopCatalog.Item it = hand.getType().isAir() ? null : catalog.get(hand.getType());
+        ShopCatalog.Item it = hand.getType().isAir() ? null : plugin.catalog().get(hand.getType());
         if (it == null) {
             Msg.err(p, "The shop doesn't buy that.");
             return;
@@ -154,7 +160,7 @@ public final class ShopMenu implements TabExecutor, Listener {
 
     private void sellHand(Player p) {
         ItemStack hand = p.getInventory().getItemInMainHand();
-        ShopCatalog.Item it = hand.getType().isAir() ? null : catalog.sellable(hand.getType());
+        ShopCatalog.Item it = hand.getType().isAir() ? null : plugin.catalog().sellable(hand.getType());
         if (it == null || !hand.isSimilar(new ItemStack(hand.getType()))) {
             Msg.err(p, "The shop doesn't buy that.");
             return;
@@ -173,7 +179,7 @@ public final class ShopMenu implements TabExecutor, Listener {
         PlayerInventory inv = p.getInventory();
         java.util.Map<Material, Integer> counts = new java.util.LinkedHashMap<>();
         for (ItemStack s : inv.getStorageContents()) {
-            if (s == null || catalog.sellable(s.getType()) == null || !s.isSimilar(new ItemStack(s.getType()))) continue;
+            if (s == null || plugin.catalog().sellable(s.getType()) == null || !s.isSimilar(new ItemStack(s.getType()))) continue;
             counts.merge(s.getType(), s.getAmount(), Integer::sum);
         }
         if (counts.isEmpty()) {
@@ -188,7 +194,7 @@ public final class ShopMenu implements TabExecutor, Listener {
         long total = 0;
         int items = 0;
         for (var e : counts.entrySet()) {
-            total += sell(p, catalog.get(e.getKey()), e.getValue());
+            total += sell(p, plugin.catalog().get(e.getKey()), e.getValue());
             items += e.getValue();
         }
         Msg.ok(p, "Sold <white><n></white> items for <green><m></green>.",
@@ -200,7 +206,7 @@ public final class ShopMenu implements TabExecutor, Listener {
         long total = 0;
         p.sendMessage(Msg.mm("<gradient:#b86bff:#ff6bd6><bold>/sell all</bold></gradient> <gray>would sell:"));
         for (var e : counts.entrySet()) {
-            ShopCatalog.Item it = catalog.get(e.getKey());
+            ShopCatalog.Item it = plugin.catalog().get(e.getKey());
             long got = sellPayout(it, e.getValue());
             total += got;
             p.sendMessage(Msg.mm("  <white><n>× <i></white> <green><m></green><rare>",
@@ -221,7 +227,7 @@ public final class ShopMenu implements TabExecutor, Listener {
     private void openCategories(Player p) {
         View view = new View(-1);
         view.inv = Bukkit.createInventory(view, 27, Msg.mm("<dark_purple>Shop"));
-        List<ShopCatalog.Category> cats = catalog.categories();
+        List<ShopCatalog.Category> cats = plugin.catalog().categories();
         int[] slots = {10, 11, 12, 14, 15, 16, 19, 20, 21, 23, 24, 25};
         for (int i = 0; i < cats.size() && i < slots.length; i++) {
             ShopCatalog.Category c = cats.get(i);
@@ -236,14 +242,14 @@ public final class ShopMenu implements TabExecutor, Listener {
 
     private void openCategory(Player p, int index) {
         View view = new View(index);
-        ShopCatalog.Category c = catalog.categories().get(index);
+        ShopCatalog.Category c = plugin.catalog().categories().get(index);
         view.inv = Bukkit.createInventory(view, 54, Msg.mm("<dark_purple>Shop <dark_gray>· <n>", Msg.v("n", c.name())));
         render(p, view);
         p.openInventory(view.inv);
     }
 
     private void render(Player p, View view) {
-        ShopCatalog.Category c = catalog.categories().get(view.categoryIndex);
+        ShopCatalog.Category c = plugin.catalog().categories().get(view.categoryIndex);
         view.inv.clear();
         for (int i = 0; i < c.items().size() && i < 45; i++) {
             ShopCatalog.Item it = c.items().get(i);
@@ -271,7 +277,7 @@ public final class ShopMenu implements TabExecutor, Listener {
         if (view.categoryIndex == -1) {
             int[] slots = {10, 11, 12, 14, 15, 16, 19, 20, 21, 23, 24, 25};
             for (int i = 0; i < slots.length; i++) {
-                if (slots[i] == slot && i < catalog.categories().size()) openCategory(p, i);
+                if (slots[i] == slot && i < plugin.catalog().categories().size()) openCategory(p, i);
             }
             return;
         }
@@ -279,7 +285,7 @@ public final class ShopMenu implements TabExecutor, Listener {
             openCategories(p);
             return;
         }
-        List<ShopCatalog.Item> items = catalog.categories().get(view.categoryIndex).items();
+        List<ShopCatalog.Item> items = plugin.catalog().categories().get(view.categoryIndex).items();
         if (slot >= items.size() || slot >= 45) return;
         ShopCatalog.Item it = items.get(slot);
         ClickType click = e.getClick();

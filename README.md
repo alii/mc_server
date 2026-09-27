@@ -4,7 +4,7 @@ A Paper 26.2 survival server with a custom economy plugin. Everything needed to 
 
 - `compose.yml` — the server and 6-hourly backups (Docker, [itzg/minecraft-server](https://github.com/itzg/docker-minecraft-server)). `server.properties` is generated from its settings.
 - `config/` — copied over the server folder on every start. Right now that's `bukkit.yml`, which raises the animal spawn cap (70) and spawns animals every 5 seconds instead of 20.
-- `plugin/` — NetheriteMarket: in-game money, a balanced server shop, a player market, and trading with real stock prices.
+- `plugin/` — SmpPlugin: in-game money, a balanced server shop, a player market, and trading with real stock prices.
 - Plugins from Modrinth: ViaVersion (lets newer clients join), Chunky (world pre-generation), LuckPerms (permissions).
 
 ## Run it
@@ -55,7 +55,7 @@ Integration tests run the real plugin inside [MockBukkit](https://github.com/Moc
 | `/market`, `/market sell <price>`, `/market mine` | Player item shop |
 | `/eco give\|take\|set <player> <amount>` | Admin |
 
-Prices and tuning are in the plugin's [`config.yml`](minecraft/plugin/src/main/resources/config.yml) and [`shop.yml`](minecraft/plugin/src/main/resources/shop.yml), written to `data/plugins/NetheriteMarket/` on first start.
+Prices and tuning are in the plugin's [`config.yml`](minecraft/plugin/src/main/resources/config.yml) and [`shop.yml`](minecraft/plugin/src/main/resources/shop.yml), written to `data/plugins/SmpPlugin/` on first start. Edit them there and run `/smp reload`; no restart needed. Code changes still need a restart.
 
 ## How the shop stays fair
 

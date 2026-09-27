@@ -14,6 +14,10 @@ public class MarketPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if (!moveOldData()) {
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         saveDefaultConfig();
         settings = Settings.from(getConfig());
         getDataFolder().mkdirs();
@@ -27,6 +31,7 @@ public class MarketPlugin extends JavaPlugin {
         prices = new PriceService(settings);
         if (!new File(getDataFolder(), "shop.yml").exists()) saveResource("shop.yml", false);
         catalog = ShopCatalog.load(new File(getDataFolder(), "shop.yml"), getLogger());
+        bind("smp", new SmpCommand(this));
 
         EconomyCommands eco = new EconomyCommands(this);
         for (String c : new String[] {"balance", "pay", "baltop", "eco"}) bind(c, eco);
@@ -36,7 +41,7 @@ public class MarketPlugin extends JavaPlugin {
         MarketMenu market = new MarketMenu(this);
         bind("market", market);
         getServer().getPluginManager().registerEvents(market, this);
-        ShopMenu shop = new ShopMenu(this, catalog);
+        ShopMenu shop = new ShopMenu(this);
         for (String c : new String[] {"shop", "sell", "worth"}) bind(c, shop);
         getServer().getPluginManager().registerEvents(shop, this);
         getServer().getPluginManager().registerEvents(new JoinBonus(this), this);
@@ -53,6 +58,30 @@ public class MarketPlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * This plugin used to be called NetheriteMarket. Moves its folder (balances, market, config) to
+     * the new name. Returns false if that failed, so we don't start on an empty database.
+     */
+    private boolean moveOldData() {
+        File old = new File(getDataFolder().getParentFile(), "NetheriteMarket");
+        if (getDataFolder().exists() || !old.isDirectory()) return true;
+        if (old.renameTo(getDataFolder())) {
+            getLogger().info("Moved " + old + " to " + getDataFolder());
+            return true;
+        }
+        getLogger().severe("Couldn't move " + old + " to " + getDataFolder() + ", move it by hand");
+        return false;
+    }
+
+    /** Re-reads config.yml and shop.yml. Code changes still need a restart. */
+    public void reload() {
+        ShopMenu.closeAll(getServer());
+        reloadConfig();
+        settings = Settings.from(getConfig());
+        prices = new PriceService(settings);
+        catalog = ShopCatalog.load(new File(getDataFolder(), "shop.yml"), getLogger());
+    }
+
     private void bind(String name, TabExecutor exec) {
         var cmd = Objects.requireNonNull(getCommand(name), name);
         cmd.setExecutor(exec);
@@ -67,6 +96,10 @@ public class MarketPlugin extends JavaPlugin {
 
     public Settings settings() {
         return settings;
+    }
+
+    public ShopCatalog catalog() {
+        return catalog;
     }
 
     public Db db() {

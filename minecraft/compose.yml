@@ -29,6 +29,10 @@ services:
       OPS: ${OPS:-}
       ENABLE_RCON: "true"
 
+      # gamerules aren't server.properties, so they're set over RCON on every start
+      RCON_CMDS_STARTUP: |-
+        gamerule players_sleeping_percentage 30
+
       # plugins from Modrinth
       MODRINTH_PROJECTS: |
         viaversion
