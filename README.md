@@ -46,14 +46,17 @@ Integration tests run the real plugin inside [MockBukkit](https://github.com/Moc
 | Command | What it does |
 |---|---|
 | `/shop` | Server shop menu. Left click sells, right click buys, shift for more |
-| `/sell [hand\|all]`, `/worth` | Quick selling, and checking a price |
+| `/sell hand`, `/worth` | Sell what you're holding, and check a price |
+| `/sell all` | Menu of everything sellable in your inventory. Click items to keep them, then confirm |
 | `/bal [player]`, `/pay <player> <amount>`, `/baltop` | Money basics |
-| `/stock <TICKER>` | Live price |
+| `/stock` | Stocks menu: popular stocks, your portfolio, search. Click one to buy or sell |
+| `/stock <TICKER>` | Trade screen for that stock |
 | `/stock buy <TICKER> <shares\|$amount>` | Buy at the real price (fractional shares OK) |
 | `/stock sell <TICKER> <shares\|all>` | Sell at the real price |
 | `/portfolio [player]` | Holdings and profit/loss |
 | `/market`, `/market sell <price>`, `/market mine` | Player item shop |
 | `/eco give\|take\|set <player> <amount>` | Admin |
+| `/smp reload` | Admin: re-read `config.yml` and `shop.yml` |
 
 Prices and tuning are in the plugin's [`config.yml`](minecraft/plugin/src/main/resources/config.yml) and [`shop.yml`](minecraft/plugin/src/main/resources/shop.yml), written to `data/plugins/SmpPlugin/` on first start. Edit them there and run `/smp reload`; no restart needed. Code changes still need a restart.
 

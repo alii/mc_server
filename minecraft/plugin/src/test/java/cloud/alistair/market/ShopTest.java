@@ -43,36 +43,39 @@ class ShopTest extends PluginTest {
         assertEquals(1, count(p, Material.DIAMOND));
     }
 
+    /** The /sell all slot showing {@code m}, or fails. */
+    private int sellSlot(PlayerMock p, Material m) {
+        var top = p.getOpenInventory().getTopInventory();
+        for (int i = 0; i < 45; i++) {
+            var s = top.getItem(i);
+            if (s != null && s.getType() == m) return i;
+        }
+        throw new AssertionError(m + " is not in /sell all");
+    }
+
     @Test
-    void sellAllOnlyPreviewsAtFirst() {
+    void sellAllOpensAMenuAndSellsNothingYet() {
         PlayerMock p = player("steve");
         p.getInventory().addItem(new ItemStack(Material.DIAMOND, 10), new ItemStack(Material.COBBLESTONE, 64));
-        String out = run(p, "sell all");
-        assertTrue(out.contains("would sell"), out);
-        assertTrue(out.contains("[Confirm]"), out);
-        assertTrue(out.contains("can't buy back"), "diamonds should be flagged: " + out);
+        run(p, "sell all");
+        var top = p.getOpenInventory().getTopInventory();
+        String diamonds = StockMenuTest.text(top.getItem(sellSlot(p, Material.DIAMOND)));
+        assertTrue(diamonds.contains("Selling 10× Diamond") && diamonds.contains("won't sell this back"), diamonds);
+        assertTrue(StockMenuTest.text(top.getItem(ShopMenu.SELLBOX_CONFIRM)).contains("Sell for $"));
         assertEquals(10, count(p, Material.DIAMOND));
-        assertEquals(64, count(p, Material.COBBLESTONE));
         assertEquals(100_00, balance(p));
     }
 
     @Test
-    void confirmWithoutPreviewOnlyPreviews() {
-        PlayerMock p = player("steve");
-        p.getInventory().addItem(new ItemStack(Material.DIAMOND, 10));
-        assertTrue(run(p, "sell all confirm").contains("would sell"));
-        assertEquals(10, count(p, Material.DIAMOND));
-    }
-
-    @Test
-    void sellAllConfirmSellsShopItemsOnly() {
+    void confirmSellsPlainShopItemsOnly() {
         PlayerMock p = player("steve");
         ItemStack named = new ItemStack(Material.DIAMOND);
         named.editMeta(m -> m.displayName(Component.text("Lucky")));
         p.getInventory().addItem(new ItemStack(Material.DIAMOND, 10), new ItemStack(Material.COBBLESTONE, 64),
                 new ItemStack(Material.DIAMOND_SWORD), named);
         run(p, "sell all");
-        assertTrue(run(p, "sell all confirm").contains("Sold 74 items"));
+        click(p, ShopMenu.SELLBOX_CONFIRM, ClickType.LEFT);
+        assertTrue(saidAll(p).contains("Sold 74 items"));
         assertEquals(1, count(p, Material.DIAMOND), "renamed diamond is kept");
         assertEquals(0, count(p, Material.COBBLESTONE));
         assertEquals(1, count(p, Material.DIAMOND_SWORD));
@@ -80,14 +83,47 @@ class ShopTest extends PluginTest {
     }
 
     @Test
-    void confirmIsSingleUse() {
+    void clickingAnItemKeepsIt() {
         PlayerMock p = player("steve");
-        p.getInventory().addItem(new ItemStack(Material.DIAMOND, 1));
+        p.getInventory().addItem(new ItemStack(Material.DIAMOND, 10), new ItemStack(Material.COBBLESTONE, 64));
         run(p, "sell all");
-        run(p, "sell all confirm");
-        p.getInventory().addItem(new ItemStack(Material.DIAMOND, 5));
-        assertTrue(run(p, "sell all confirm").contains("would sell"));
-        assertEquals(5, count(p, Material.DIAMOND));
+        int slot = sellSlot(p, Material.DIAMOND);
+        click(p, slot, ClickType.LEFT);
+        assertTrue(StockMenuTest.text(p.getOpenInventory().getTopInventory().getItem(slot)).contains("Keeping"));
+        click(p, ShopMenu.SELLBOX_CONFIRM, ClickType.LEFT);
+        assertEquals(10, count(p, Material.DIAMOND));
+        assertEquals(0, count(p, Material.COBBLESTONE));
+    }
+
+    @Test
+    void clickingAgainSellsItAfterAll() {
+        PlayerMock p = player("steve");
+        p.getInventory().addItem(new ItemStack(Material.DIAMOND, 10));
+        run(p, "sell all");
+        int slot = sellSlot(p, Material.DIAMOND);
+        click(p, slot, ClickType.LEFT);
+        click(p, slot, ClickType.LEFT);
+        click(p, ShopMenu.SELLBOX_CONFIRM, ClickType.LEFT);
+        assertEquals(0, count(p, Material.DIAMOND));
+    }
+
+    @Test
+    void cancelOrClosingSellsNothing() {
+        PlayerMock p = player("steve");
+        p.getInventory().addItem(new ItemStack(Material.DIAMOND, 10));
+        run(p, "sell all");
+        click(p, ShopMenu.SELLBOX_CANCEL, ClickType.LEFT);
+        run(p, "sell all");
+        p.closeInventory();
+        assertEquals(10, count(p, Material.DIAMOND));
+        assertEquals(100_00, balance(p));
+    }
+
+    @Test
+    void sellAllWithNothingSellable() {
+        PlayerMock p = player("steve");
+        p.getInventory().addItem(new ItemStack(Material.DIAMOND_SWORD));
+        assertTrue(run(p, "sell all").contains("Nothing in your inventory"));
     }
 
     @Test
@@ -246,7 +282,7 @@ class ShopTest extends PluginTest {
         PlayerMock p = player("steve");
         p.getInventory().addItem(new ItemStack(Material.BEEF, 10), new ItemStack(Material.COOKED_BEEF, 10));
         run(p, "sell all");
-        run(p, "sell all confirm");
+        click(p, ShopMenu.SELLBOX_CONFIRM, ClickType.LEFT);
         assertEquals(0, count(p, Material.BEEF));
         assertEquals(10, count(p, Material.COOKED_BEEF));
         run(p, "shop");

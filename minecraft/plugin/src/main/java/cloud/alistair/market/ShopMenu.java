@@ -42,8 +42,26 @@ public final class ShopMenu implements TabExecutor, Listener {
         }
     }
 
+    /** /sell all: what's sellable, and which of it the player chose to keep. */
+    private static final class SellBox implements InventoryHolder {
+        final java.util.Map<Material, Integer> counts;
+        final java.util.Set<Material> keep = java.util.EnumSet.noneOf(Material.class);
+        final Material[] slots = new Material[45];
+        Inventory inv;
+
+        SellBox(java.util.Map<Material, Integer> counts) {
+            this.counts = counts;
+        }
+
+        @Override
+        public Inventory getInventory() {
+            return inv;
+        }
+    }
+
+    static final int SELLBOX_CANCEL = 48, SELLBOX_TOTAL = 49, SELLBOX_CONFIRM = 50;
+
     private final MarketPlugin plugin;
-    private final java.util.Map<java.util.UUID, Long> pendingSellAll = new java.util.HashMap<>();
 
     public ShopMenu(MarketPlugin plugin) {
         this.plugin = plugin;
@@ -53,7 +71,7 @@ public final class ShopMenu implements TabExecutor, Listener {
     public static void closeAll(org.bukkit.Server server) {
         for (Player p : server.getOnlinePlayers()) {
             Inventory top = p.getOpenInventory().getTopInventory();
-            if (top != null && top.getHolder() instanceof View) p.closeInventory();
+            if (top != null && (top.getHolder() instanceof View || top.getHolder() instanceof SellBox)) p.closeInventory();
         }
     }
 
@@ -128,7 +146,7 @@ public final class ShopMenu implements TabExecutor, Listener {
             case "worth" -> worth(p);
             case "sell" -> {
                 String what = args.length > 0 ? args[0].toLowerCase() : "hand";
-                if (what.equals("all")) sellEverything(p, args.length > 1 && args[1].equalsIgnoreCase("confirm"));
+                if (what.equals("all")) openSellBox(p);
                 else if (what.equals("hand")) sellHand(p);
                 else Msg.err(p, "Usage: /sell [hand|all]");
             }
@@ -174,52 +192,95 @@ public final class ShopMenu implements TabExecutor, Listener {
                 Msg.v("n", String.valueOf(n)), Msg.v("i", pretty(it.material())), Msg.v("m", Money.format(payout)));
     }
 
-    /** Sells every plain shop item in the main inventory (not armor or offhand). Previews first. */
-    private void sellEverything(Player p, boolean confirmed) {
-        PlayerInventory inv = p.getInventory();
+    /** Every plain shop item in the main inventory (not armor or offhand), with how many. */
+    private java.util.Map<Material, Integer> sellableCounts(PlayerInventory inv) {
         java.util.Map<Material, Integer> counts = new java.util.LinkedHashMap<>();
         for (ItemStack s : inv.getStorageContents()) {
             if (s == null || plugin.catalog().sellable(s.getType()) == null || !s.isSimilar(new ItemStack(s.getType()))) continue;
             counts.merge(s.getType(), s.getAmount(), Integer::sum);
         }
+        return counts;
+    }
+
+    // --- /sell all ---
+
+    /** Items stay in the player's inventory until they confirm, so closing or crashing loses nothing. */
+    private void openSellBox(Player p) {
+        java.util.Map<Material, Integer> counts = sellableCounts(p.getInventory());
         if (counts.isEmpty()) {
             Msg.err(p, "Nothing in your inventory the shop buys.");
             return;
         }
-        Long asked = pendingSellAll.remove(p.getUniqueId());
-        if (!confirmed || asked == null || System.currentTimeMillis() - asked > 30_000) {
-            previewSellAll(p, counts);
+        SellBox box = new SellBox(counts);
+        box.inv = Bukkit.createInventory(box, 54, Msg.mm("<dark_purple>Sell inventory"));
+        renderSellBox(box);
+        p.openInventory(box.inv);
+    }
+
+    private void renderSellBox(SellBox box) {
+        box.inv.clear();
+        long total = 0;
+        int i = 0;
+        for (var e : box.counts.entrySet()) {
+            if (i >= box.slots.length) break;
+            ShopCatalog.Item it = plugin.catalog().get(e.getKey());
+            int n = e.getValue();
+            long got = sellPayout(it, n);
+            boolean keeping = box.keep.contains(e.getKey());
+            if (!keeping) total += got;
+            ItemStack icon = keeping
+                    ? button(e.getKey(), "<gray>Keeping " + n + "× " + pretty(e.getKey()), "<dark_gray>Click to sell it after all")
+                    : button(e.getKey(), "<green>Selling " + n + "× " + pretty(e.getKey()),
+                            "<gray>You get <green>" + Money.format(got),
+                            it.buyable() ? "<dark_gray>Click to keep it" : "<gold>⚠ The shop won't sell this back",
+                            it.buyable() ? "" : "<dark_gray>Click to keep it");
+            icon.setAmount(Math.min(n, e.getKey().getMaxStackSize()));
+            box.inv.setItem(i, icon);
+            box.slots[i] = e.getKey();
+            i++;
+        }
+        box.inv.setItem(SELLBOX_CANCEL, button(Material.BARRIER, "<red>Cancel", "<gray>Sell nothing"));
+        box.inv.setItem(SELLBOX_TOTAL, button(Material.EMERALD, "<green>Total: " + Money.format(total),
+                "<gray>Click items to keep them"));
+        box.inv.setItem(SELLBOX_CONFIRM, total > 0
+                ? button(Material.LIME_CONCRETE, "<green><bold>Sell for " + Money.format(total), "<gray>Everything marked Selling")
+                : button(Material.GRAY_CONCRETE, "<gray>Nothing selected"));
+    }
+
+    private void clickSellBox(Player p, SellBox box, int slot) {
+        if (slot == SELLBOX_CANCEL) {
+            p.closeInventory();
             return;
         }
+        if (slot == SELLBOX_CONFIRM) {
+            confirmSellBox(p, box);
+            return;
+        }
+        if (slot < box.slots.length && box.slots[slot] != null) {
+            Material m = box.slots[slot];
+            if (!box.keep.remove(m)) box.keep.add(m);
+            renderSellBox(box);
+        }
+    }
+
+    /** Recounts at confirm time, so it only ever sells what's really there. */
+    private void confirmSellBox(Player p, SellBox box) {
         long total = 0;
         int items = 0;
-        for (var e : counts.entrySet()) {
-            total += sell(p, plugin.catalog().get(e.getKey()), e.getValue());
-            items += e.getValue();
+        for (Material m : box.counts.keySet()) {
+            if (box.keep.contains(m)) continue;
+            int n = countPlain(p.getInventory(), m);
+            if (n == 0 || plugin.catalog().sellable(m) == null) continue;
+            total += sell(p, plugin.catalog().get(m), n);
+            items += n;
+        }
+        p.closeInventory();
+        if (items == 0) {
+            Msg.err(p, "Nothing sold.");
+            return;
         }
         Msg.ok(p, "Sold <white><n></white> items for <green><m></green>.",
                 Msg.v("n", String.valueOf(items)), Msg.v("m", Money.format(total)));
-    }
-
-    private void previewSellAll(Player p, java.util.Map<Material, Integer> counts) {
-        pendingSellAll.put(p.getUniqueId(), System.currentTimeMillis());
-        long total = 0;
-        p.sendMessage(Msg.mm("<gradient:#b86bff:#ff6bd6><bold>/sell all</bold></gradient> <gray>would sell:"));
-        for (var e : counts.entrySet()) {
-            ShopCatalog.Item it = plugin.catalog().get(e.getKey());
-            long got = sellPayout(it, e.getValue());
-            total += got;
-            p.sendMessage(Msg.mm("  <white><n>× <i></white> <green><m></green><rare>",
-                    Msg.v("n", String.valueOf(e.getValue())), Msg.v("i", pretty(e.getKey())), Msg.v("m", Money.format(got)),
-                    net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component("rare",
-                            it.buyable() ? Component.empty() : Msg.mm(" <gold>⚠ can't buy back"))));
-        }
-        p.sendMessage(Msg.mm("  <gray>Total: <green><m></green>  <confirm>  <dark_gray>(30s)",
-                Msg.v("m", Money.format(total)),
-                net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component("confirm",
-                        Msg.mm("<green><bold>[Confirm]</bold>")
-                                .clickEvent(net.kyori.adventure.text.event.ClickEvent.runCommand("/sell all confirm"))
-                                .hoverEvent(Msg.mm("<gray>Click to sell all of this")))));
     }
 
     // --- menus ---
@@ -269,6 +330,12 @@ public final class ShopMenu implements TabExecutor, Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
+        if (e.getView().getTopInventory().getHolder() instanceof SellBox box) {
+            e.setCancelled(true);
+            int slot = e.getRawSlot();
+            if (e.getWhoClicked() instanceof Player p && slot >= 0 && slot < box.inv.getSize()) clickSellBox(p, box, slot);
+            return;
+        }
         if (!(e.getView().getTopInventory().getHolder() instanceof View view)) return;
         e.setCancelled(true);
         if (!(e.getWhoClicked() instanceof Player p)) return;
@@ -310,7 +377,8 @@ public final class ShopMenu implements TabExecutor, Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent e) {
-        if (e.getView().getTopInventory().getHolder() instanceof View) e.setCancelled(true);
+        var holder = e.getView().getTopInventory().getHolder();
+        if (holder instanceof View || holder instanceof SellBox) e.setCancelled(true);
     }
 
     // --- helpers ---
