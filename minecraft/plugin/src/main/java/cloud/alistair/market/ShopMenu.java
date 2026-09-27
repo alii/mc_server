@@ -62,9 +62,11 @@ public final class ShopMenu implements TabExecutor, Listener {
     static final int SELLBOX_CANCEL = 48, SELLBOX_TOTAL = 49, SELLBOX_CONFIRM = 50;
 
     private final SmpCore plugin;
+    private final ShopFeed feed;
 
     public ShopMenu(SmpCore plugin) {
         this.plugin = plugin;
+        this.feed = new ShopFeed(plugin);
     }
 
     // --- pricing ---
@@ -97,6 +99,7 @@ public final class ShopMenu implements TabExecutor, Listener {
         takeFromInventory(p.getInventory(), it.material(), count);
         plugin.db().addPressure(it.base().name(), (double) it.worthCents() * count, plugin.settings().recoveryHalfLifeHours());
         plugin.db().add(p.getUniqueId(), p.getName(), payout, "shop-sell", count + " " + it.material().name());
+        feed.sold(p, it.material(), count, payout);
         return payout;
     }
 
@@ -113,6 +116,7 @@ public final class ShopMenu implements TabExecutor, Listener {
         }
         plugin.db().add(p.getUniqueId(), p.getName(), -cost, "shop-buy", count + " " + it.material().name());
         EconomyCommands.give(p, new ItemStack(it.material(), count));
+        feed.bought(p, it.material(), count, cost);
         Msg.ok(p, "Bought <white><n>× <i></white> for <green><m></green>.",
                 Msg.v("n", String.valueOf(count)), Msg.v("i", pretty(it.material())), Msg.v("m", Money.format(cost)));
     }
@@ -180,6 +184,7 @@ public final class ShopMenu implements TabExecutor, Listener {
         long payout = sellPayout(it, n);
         plugin.db().addPressure(it.base().name(), (double) it.worthCents() * n, plugin.settings().recoveryHalfLifeHours());
         plugin.db().add(p.getUniqueId(), p.getName(), payout, "shop-sell", n + " " + it.material().name());
+        feed.sold(p, it.material(), n, payout);
         Msg.ok(p, "Sold <white><n>× <i></white> for <green><m></green>.",
                 Msg.v("n", String.valueOf(n)), Msg.v("i", pretty(it.material())), Msg.v("m", Money.format(payout)));
     }

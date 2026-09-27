@@ -62,7 +62,7 @@ Integration tests run the real plugin inside [MockBukkit](https://github.com/Moc
 | `/eco give\|take\|set <player> <amount>` | Admin |
 | `/smp reload` | Admin: load new plugin code, `config.yml` and `shop.yml` without a restart |
 
-Prices and tuning are in the plugin's [`config.yml`](minecraft/plugin/src/main/resources/config.yml) and [`shop.yml`](minecraft/plugin/src/main/resources/shop.yml), written to `data/plugins/SmpPlugin/` on first start. Edit them there and run `/smp reload`. Chat tips (every 15 minutes) are in `config.yml` too.
+Prices and tuning are in the plugin's [`config.yml`](minecraft/plugin/src/main/resources/config.yml) and [`shop.yml`](minecraft/plugin/src/main/resources/shop.yml), written to `data/plugins/SmpPlugin/` on first start. Edit them there and run `/smp reload`. Chat tips (every 15 minutes), shop announcements and the sleep notice are set there too.
 
 ## How the shop stays fair
 

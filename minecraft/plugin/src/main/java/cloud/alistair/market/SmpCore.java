@@ -53,6 +53,7 @@ public final class SmpCore implements Module {
         for (String c : new String[] {"shop", "sell", "worth"}) bind(c, shop);
         listen(shop);
         listen(new JoinBonus(this));
+        if (settings.announceSleep()) listen(new SleepNotice(this));
         Tips.start(this);
         getLogger().info("Core loaded. Shop has " + catalog.size() + " items");
     }

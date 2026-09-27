@@ -25,7 +25,10 @@ public record Settings(
         int maxListingsPerPlayer,
         Map<String, Material> popularStocks,
         int tipIntervalMinutes,
-        List<String> tips) {
+        List<String> tips,
+        int shopFeedSeconds,
+        long shopFeedMinCents,
+        boolean announceSleep) {
 
     public static Settings from(FileConfiguration c) {
         return new Settings(
@@ -43,7 +46,10 @@ public record Settings(
                 c.getInt("max-listings-per-player"),
                 popular(c.getConfigurationSection("popular-stocks")),
                 c.getInt("tip-interval-minutes"),
-                List.copyOf(c.getStringList("tips")));
+                List.copyOf(c.getStringList("tips")),
+                c.getInt("shop-feed-seconds"),
+                Math.round(c.getDouble("shop-feed-min-dollars") * 100),
+                c.getBoolean("announce-sleep"));
     }
 
     /** Ticker to icon, in config order. Unknown items fall back to paper. */
