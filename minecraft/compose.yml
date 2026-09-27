@@ -1,0 +1,59 @@
+# Paper SMP. server.properties is generated from the environment below by the
+# itzg/minecraft-server image, so every non-default setting lives here.
+# Personal bits (ops, whitelist, port, timezone) come from .env — see .env.example.
+services:
+  mc:
+    image: itzg/minecraft-server:java25
+    container_name: mc
+    restart: unless-stopped
+    ports:
+      - "${PORT:-25565}:25565"
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      VERSION: "26.2"
+      MEMORY: 10G
+      USE_AIKAR_FLAGS: "true"
+      TZ: ${TZ:-UTC}
+
+      # server.properties
+      MOTD: "§d§lnetherite §7SMP"
+      DIFFICULTY: normal
+      MAX_PLAYERS: "30"
+      VIEW_DISTANCE: "12"
+      SIMULATION_DISTANCE: "10"
+      SPAWN_PROTECTION: "0"
+      ENABLE_WHITELIST: "TRUE"
+      ENFORCE_WHITELIST: "TRUE"
+      WHITELIST: ${WHITELIST:-}
+      OPS: ${OPS:-}
+      ENABLE_RCON: "true"
+
+      # plugins from Modrinth
+      MODRINTH_PROJECTS: |
+        viaversion
+        chunky
+        luckperms
+      MODRINTH_ALLOWED_VERSION_TYPE: beta
+
+      # ./config is copied over /data on every start (bukkit.yml etc.)
+      COPY_CONFIG_DEST: /data
+    volumes:
+      - ./data:/data
+      - ./config:/config:ro
+      # our plugin: build it first with `cd plugin && ./gradlew build`
+      - ./plugin/build/libs:/plugins:ro
+
+  backups:
+    image: itzg/mc-backup
+    restart: unless-stopped
+    depends_on: [mc]
+    environment:
+      RCON_HOST: mc
+      BACKUP_INTERVAL: 6h
+      PRUNE_BACKUPS_DAYS: "7"
+      INITIAL_DELAY: 10m
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ./data:/data:ro
+      - ./backups:/backups

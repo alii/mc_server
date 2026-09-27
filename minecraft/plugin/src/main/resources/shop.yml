@@ -1,0 +1,372 @@
+# Server shop. `worth` is what the server pays for ONE item when nobody has sold it recently.
+# Buying from the server costs worth × buy-multiplier (config.yml). `buy: false` = sell-only,
+# `sell: false` (per item, or for a whole category) = buy-only.
+#
+# Storage blocks (iron block, hay bale, slime block...) are handled automatically as 9× (or 4×)
+# the base item, and share its price drop. Don't list them here.
+#
+# Rough anchor: an hour of strip mining ≈ $1,000. AAPL is ~$340.
+
+categories:
+  ores:
+    icon: DIAMOND
+    name: "Ores & Minerals"
+    items:
+      COAL: {worth: 1.00}
+      RAW_COPPER: {worth: 0.40}
+      COPPER_INGOT: {worth: 0.50}
+      RAW_IRON: {worth: 3.50}
+      IRON_INGOT: {worth: 4.00}
+      RAW_GOLD: {worth: 5.00}
+      GOLD_INGOT: {worth: 6.00}
+      REDSTONE: {worth: 0.30}
+      LAPIS_LAZULI: {worth: 0.40}
+      AMETHYST_SHARD: {worth: 0.30}
+      QUARTZ: {worth: 0.40}
+      EMERALD: {worth: 10.00, buy: false}
+      DIAMOND: {worth: 40.00, buy: false}
+      ANCIENT_DEBRIS: {worth: 180.00, buy: false}
+      NETHERITE_SCRAP: {worth: 190.00, buy: false}
+      NETHERITE_INGOT: {worth: 800.00, buy: false}
+
+  farming:
+    icon: WHEAT
+    name: "Farming"
+    items:
+      WHEAT: {worth: 0.10}
+      WHEAT_SEEDS: {worth: 0.01}
+      CARROT: {worth: 0.08}
+      POTATO: {worth: 0.08}
+      BEETROOT: {worth: 0.08}
+      SUGAR_CANE: {worth: 0.10}
+      PUMPKIN: {worth: 0.30}
+      MELON_SLICE: {worth: 0.05}
+      CACTUS: {worth: 0.08}
+      BAMBOO: {worth: 0.02}
+      KELP: {worth: 0.02}
+      DRIED_KELP: {worth: 0.03}
+      COCOA_BEANS: {worth: 0.10}
+      SWEET_BERRIES: {worth: 0.05}
+      NETHER_WART: {worth: 0.20}
+      HONEY_BOTTLE: {worth: 1.00}
+      EGG: {worth: 0.05}
+      WHITE_WOOL: {worth: 0.30}
+      LEATHER: {worth: 0.50}
+      FEATHER: {worth: 0.10}
+      BEEF: {worth: 0.30}
+      PORKCHOP: {worth: 0.30}
+      CHICKEN: {worth: 0.20}
+      MUTTON: {worth: 0.25}
+      COD: {worth: 0.30}
+      SALMON: {worth: 0.30}
+      RABBIT: {worth: 0.25}
+      APPLE: {worth: 0.20}
+
+  mobs:
+    icon: BONE
+    name: "Mob Drops"
+    items:
+      ROTTEN_FLESH: {worth: 0.02}
+      BONE: {worth: 0.10}
+      STRING: {worth: 0.10}
+      SPIDER_EYE: {worth: 0.10}
+      ARROW: {worth: 0.02}
+      GUNPOWDER: {worth: 0.30}
+      SLIME_BALL: {worth: 0.50}
+      ENDER_PEARL: {worth: 2.00}
+      INK_SAC: {worth: 0.30}
+      GLOW_INK_SAC: {worth: 0.80}
+      PRISMARINE_SHARD: {worth: 0.30}
+      PRISMARINE_CRYSTALS: {worth: 0.40}
+      PHANTOM_MEMBRANE: {worth: 1.50}
+      RABBIT_HIDE: {worth: 0.40}
+      BREEZE_ROD: {worth: 4.00}
+
+  blocks:
+    icon: OAK_LOG
+    name: "Wood & Blocks"
+    items:
+      OAK_LOG: {worth: 0.40}
+      SPRUCE_LOG: {worth: 0.40}
+      BIRCH_LOG: {worth: 0.40}
+      JUNGLE_LOG: {worth: 0.40}
+      ACACIA_LOG: {worth: 0.40}
+      DARK_OAK_LOG: {worth: 0.40}
+      MANGROVE_LOG: {worth: 0.40}
+      CHERRY_LOG: {worth: 0.40}
+      PALE_OAK_LOG: {worth: 0.40}
+      COBBLESTONE: {worth: 0.01}
+      COBBLED_DEEPSLATE: {worth: 0.01}
+      STONE: {worth: 0.02}
+      DIRT: {worth: 0.01}
+      SAND: {worth: 0.05}
+      RED_SAND: {worth: 0.05}
+      GRAVEL: {worth: 0.03}
+      CLAY_BALL: {worth: 0.10}
+      ICE: {worth: 0.20}
+      SNOWBALL: {worth: 0.02}
+      MOSS_BLOCK: {worth: 0.10}
+      OBSIDIAN: {worth: 1.50}
+
+  nether:
+    icon: NETHERRACK
+    name: "Nether & End"
+    items:
+      NETHERRACK: {worth: 0.01}
+      BASALT: {worth: 0.02}
+      BLACKSTONE: {worth: 0.02}
+      SOUL_SAND: {worth: 0.05}
+      GLOWSTONE_DUST: {worth: 0.30}
+      MAGMA_CREAM: {worth: 1.00}
+      BLAZE_ROD: {worth: 3.00}
+      GHAST_TEAR: {worth: 5.00}
+      CRIMSON_STEM: {worth: 0.40}
+      WARPED_STEM: {worth: 0.40}
+      END_STONE: {worth: 0.03}
+      CHORUS_FRUIT: {worth: 0.10}
+      SHULKER_SHELL: {worth: 25.00, buy: false}
+
+  rare:
+    icon: NETHER_STAR
+    name: "Rare"
+    items:
+      TOTEM_OF_UNDYING: {worth: 20.00, buy: false}
+      TRIDENT: {worth: 50.00, buy: false}
+      HEART_OF_THE_SEA: {worth: 60.00, buy: false}
+      NAUTILUS_SHELL: {worth: 5.00, buy: false}
+      ECHO_SHARD: {worth: 10.00, buy: false}
+      WITHER_SKELETON_SKULL: {worth: 30.00, buy: false}
+      NETHERITE_UPGRADE_SMITHING_TEMPLATE: {worth: 150.00, buy: false}
+      ENCHANTED_GOLDEN_APPLE: {worth: 80.00, buy: false}
+      NETHER_STAR: {worth: 400.00, buy: false}
+      DRAGON_BREATH: {worth: 5.00, buy: false}
+      HEAVY_CORE: {worth: 300.00, buy: false}
+
+
+  glass:
+    icon: GLASS
+    name: "Glass"
+    sell: false
+    # Buy-only so crafted stuff can't be sold for profit. Buying costs worth × buy-multiplier.
+    items:
+      GLASS: {worth: 0.10}
+      GLASS_PANE: {worth: 0.04}
+      TINTED_GLASS: {worth: 1.00}
+      WHITE_STAINED_GLASS: {worth: 0.15}
+      ORANGE_STAINED_GLASS: {worth: 0.15}
+      MAGENTA_STAINED_GLASS: {worth: 0.15}
+      LIGHT_BLUE_STAINED_GLASS: {worth: 0.15}
+      YELLOW_STAINED_GLASS: {worth: 0.15}
+      LIME_STAINED_GLASS: {worth: 0.15}
+      PINK_STAINED_GLASS: {worth: 0.15}
+      GRAY_STAINED_GLASS: {worth: 0.15}
+      LIGHT_GRAY_STAINED_GLASS: {worth: 0.15}
+      CYAN_STAINED_GLASS: {worth: 0.15}
+      PURPLE_STAINED_GLASS: {worth: 0.15}
+      BLUE_STAINED_GLASS: {worth: 0.15}
+      BROWN_STAINED_GLASS: {worth: 0.15}
+      GREEN_STAINED_GLASS: {worth: 0.15}
+      RED_STAINED_GLASS: {worth: 0.15}
+      BLACK_STAINED_GLASS: {worth: 0.15}
+      WHITE_STAINED_GLASS_PANE: {worth: 0.06}
+      ORANGE_STAINED_GLASS_PANE: {worth: 0.06}
+      MAGENTA_STAINED_GLASS_PANE: {worth: 0.06}
+      LIGHT_BLUE_STAINED_GLASS_PANE: {worth: 0.06}
+      YELLOW_STAINED_GLASS_PANE: {worth: 0.06}
+      LIME_STAINED_GLASS_PANE: {worth: 0.06}
+      PINK_STAINED_GLASS_PANE: {worth: 0.06}
+      GRAY_STAINED_GLASS_PANE: {worth: 0.06}
+      LIGHT_GRAY_STAINED_GLASS_PANE: {worth: 0.06}
+      CYAN_STAINED_GLASS_PANE: {worth: 0.06}
+      PURPLE_STAINED_GLASS_PANE: {worth: 0.06}
+      BLUE_STAINED_GLASS_PANE: {worth: 0.06}
+      BROWN_STAINED_GLASS_PANE: {worth: 0.06}
+      GREEN_STAINED_GLASS_PANE: {worth: 0.06}
+      RED_STAINED_GLASS_PANE: {worth: 0.06}
+      BLACK_STAINED_GLASS_PANE: {worth: 0.06}
+
+  colors:
+    icon: LIME_WOOL
+    name: "Wool & Concrete"
+    sell: false
+    # Buy-only so crafted stuff can't be sold for profit. Buying costs worth × buy-multiplier.
+    items:
+      WHITE_WOOL: {worth: 0.40}
+      ORANGE_WOOL: {worth: 0.40}
+      MAGENTA_WOOL: {worth: 0.40}
+      LIGHT_BLUE_WOOL: {worth: 0.40}
+      YELLOW_WOOL: {worth: 0.40}
+      LIME_WOOL: {worth: 0.40}
+      PINK_WOOL: {worth: 0.40}
+      GRAY_WOOL: {worth: 0.40}
+      LIGHT_GRAY_WOOL: {worth: 0.40}
+      CYAN_WOOL: {worth: 0.40}
+      PURPLE_WOOL: {worth: 0.40}
+      BLUE_WOOL: {worth: 0.40}
+      BROWN_WOOL: {worth: 0.40}
+      GREEN_WOOL: {worth: 0.40}
+      RED_WOOL: {worth: 0.40}
+      BLACK_WOOL: {worth: 0.40}
+      WHITE_CONCRETE: {worth: 0.15}
+      ORANGE_CONCRETE: {worth: 0.15}
+      MAGENTA_CONCRETE: {worth: 0.15}
+      LIGHT_BLUE_CONCRETE: {worth: 0.15}
+      YELLOW_CONCRETE: {worth: 0.15}
+      LIME_CONCRETE: {worth: 0.15}
+      PINK_CONCRETE: {worth: 0.15}
+      GRAY_CONCRETE: {worth: 0.15}
+      LIGHT_GRAY_CONCRETE: {worth: 0.15}
+      CYAN_CONCRETE: {worth: 0.15}
+      PURPLE_CONCRETE: {worth: 0.15}
+      BLUE_CONCRETE: {worth: 0.15}
+      BROWN_CONCRETE: {worth: 0.15}
+      GREEN_CONCRETE: {worth: 0.15}
+      RED_CONCRETE: {worth: 0.15}
+      BLACK_CONCRETE: {worth: 0.15}
+
+  terracotta:
+    icon: ORANGE_GLAZED_TERRACOTTA
+    name: "Terracotta"
+    sell: false
+    # Buy-only so crafted stuff can't be sold for profit. Buying costs worth × buy-multiplier.
+    items:
+      TERRACOTTA: {worth: 0.15}
+      WHITE_TERRACOTTA: {worth: 0.15}
+      ORANGE_TERRACOTTA: {worth: 0.15}
+      MAGENTA_TERRACOTTA: {worth: 0.15}
+      LIGHT_BLUE_TERRACOTTA: {worth: 0.15}
+      YELLOW_TERRACOTTA: {worth: 0.15}
+      LIME_TERRACOTTA: {worth: 0.15}
+      PINK_TERRACOTTA: {worth: 0.15}
+      GRAY_TERRACOTTA: {worth: 0.15}
+      LIGHT_GRAY_TERRACOTTA: {worth: 0.15}
+      CYAN_TERRACOTTA: {worth: 0.15}
+      PURPLE_TERRACOTTA: {worth: 0.15}
+      BLUE_TERRACOTTA: {worth: 0.15}
+      BROWN_TERRACOTTA: {worth: 0.15}
+      GREEN_TERRACOTTA: {worth: 0.15}
+      RED_TERRACOTTA: {worth: 0.15}
+      BLACK_TERRACOTTA: {worth: 0.15}
+      WHITE_GLAZED_TERRACOTTA: {worth: 0.20}
+      ORANGE_GLAZED_TERRACOTTA: {worth: 0.20}
+      MAGENTA_GLAZED_TERRACOTTA: {worth: 0.20}
+      LIGHT_BLUE_GLAZED_TERRACOTTA: {worth: 0.20}
+      YELLOW_GLAZED_TERRACOTTA: {worth: 0.20}
+      LIME_GLAZED_TERRACOTTA: {worth: 0.20}
+      PINK_GLAZED_TERRACOTTA: {worth: 0.20}
+      GRAY_GLAZED_TERRACOTTA: {worth: 0.20}
+      LIGHT_GRAY_GLAZED_TERRACOTTA: {worth: 0.20}
+      CYAN_GLAZED_TERRACOTTA: {worth: 0.20}
+      PURPLE_GLAZED_TERRACOTTA: {worth: 0.20}
+      BLUE_GLAZED_TERRACOTTA: {worth: 0.20}
+      BROWN_GLAZED_TERRACOTTA: {worth: 0.20}
+      GREEN_GLAZED_TERRACOTTA: {worth: 0.20}
+      RED_GLAZED_TERRACOTTA: {worth: 0.20}
+      BLACK_GLAZED_TERRACOTTA: {worth: 0.20}
+
+  building:
+    icon: STONE_BRICKS
+    name: "Building"
+    sell: false
+    # Buy-only so crafted stuff can't be sold for profit. Buying costs worth × buy-multiplier.
+    items:
+      STONE_BRICKS: {worth: 0.05}
+      MOSSY_STONE_BRICKS: {worth: 0.08}
+      SMOOTH_STONE: {worth: 0.05}
+      BRICKS: {worth: 0.20}
+      MUD_BRICKS: {worth: 0.08}
+      POLISHED_ANDESITE: {worth: 0.03}
+      POLISHED_DIORITE: {worth: 0.03}
+      POLISHED_GRANITE: {worth: 0.03}
+      CALCITE: {worth: 0.10}
+      TUFF_BRICKS: {worth: 0.08}
+      DEEPSLATE_BRICKS: {worth: 0.05}
+      DEEPSLATE_TILES: {worth: 0.05}
+      POLISHED_DEEPSLATE: {worth: 0.05}
+      SANDSTONE: {worth: 0.08}
+      SMOOTH_SANDSTONE: {worth: 0.10}
+      RED_SANDSTONE: {worth: 0.08}
+      POLISHED_BLACKSTONE_BRICKS: {worth: 0.05}
+      NETHER_BRICKS: {worth: 0.08}
+      RED_NETHER_BRICKS: {worth: 0.15}
+      DARK_PRISMARINE: {worth: 1.50}
+      PURPUR_BLOCK: {worth: 0.20}
+      END_STONE_BRICKS: {worth: 0.08}
+      SMOOTH_QUARTZ: {worth: 1.80}
+      QUARTZ_BRICKS: {worth: 1.80}
+      EXPOSED_COPPER: {worth: 2.00}
+      WEATHERED_COPPER: {worth: 2.00}
+      OXIDIZED_COPPER: {worth: 2.00}
+      PACKED_MUD: {worth: 0.05}
+      WHITE_CONCRETE_POWDER: {worth: 0.10}
+
+  decor:
+    icon: LANTERN
+    name: "Decor"
+    sell: false
+    # Buy-only so crafted stuff can't be sold for profit. Buying costs worth × buy-multiplier.
+    items:
+      LANTERN: {worth: 2.00}
+      SOUL_LANTERN: {worth: 2.00}
+      IRON_CHAIN: {worth: 1.00}
+      SEA_LANTERN: {worth: 2.00}
+      SHROOMLIGHT: {worth: 1.00}
+      END_ROD: {worth: 2.00}
+      OCHRE_FROGLIGHT: {worth: 3.00}
+      VERDANT_FROGLIGHT: {worth: 3.00}
+      PEARLESCENT_FROGLIGHT: {worth: 3.00}
+      BOOKSHELF: {worth: 1.50}
+      FLOWER_POT: {worth: 0.30}
+      CANDLE: {worth: 0.50}
+      ITEM_FRAME: {worth: 0.50}
+      GLOW_ITEM_FRAME: {worth: 1.00}
+      PAINTING: {worth: 0.50}
+      ARMOR_STAND: {worth: 1.00}
+      MOSS_CARPET: {worth: 0.10}
+      OAK_LEAVES: {worth: 0.10}
+      AZALEA_LEAVES: {worth: 0.10}
+      FLOWERING_AZALEA_LEAVES: {worth: 0.20}
+      CHERRY_LEAVES: {worth: 0.10}
+      POPPY: {worth: 0.10}
+      DANDELION: {worth: 0.10}
+      CORNFLOWER: {worth: 0.10}
+      ALLIUM: {worth: 0.10}
+      BLUE_ORCHID: {worth: 0.10}
+      LILY_OF_THE_VALLEY: {worth: 0.10}
+      OXEYE_DAISY: {worth: 0.10}
+      SUNFLOWER: {worth: 0.15}
+      PEONY: {worth: 0.15}
+      LILAC: {worth: 0.15}
+      ROSE_BUSH: {worth: 0.15}
+      PINK_PETALS: {worth: 0.10}
+      LILY_PAD: {worth: 0.10}
+      VINE: {worth: 0.05}
+      HANGING_ROOTS: {worth: 0.05}
+      DECORATED_POT: {worth: 0.50}
+      CAMPFIRE: {worth: 0.50}
+      BELL: {worth: 5.00}
+
+  food:
+    icon: COOKED_BEEF
+    name: "Food"
+    sell: false
+    # Buy-only so nobody can cook cheap raw food and sell it for profit.
+    items:
+      BREAD: {worth: 0.35}
+      BAKED_POTATO: {worth: 0.15}
+      COOKED_BEEF: {worth: 0.50}
+      COOKED_PORKCHOP: {worth: 0.50}
+      COOKED_MUTTON: {worth: 0.40}
+      COOKED_CHICKEN: {worth: 0.35}
+      COOKED_RABBIT: {worth: 0.40}
+      COOKED_COD: {worth: 0.40}
+      COOKED_SALMON: {worth: 0.45}
+      GOLDEN_CARROT: {worth: 2.00}
+      GOLDEN_APPLE: {worth: 50.00}
+      COOKIE: {worth: 0.05}
+      PUMPKIN_PIE: {worth: 0.50}
+      CAKE: {worth: 1.50}
+      MUSHROOM_STEW: {worth: 0.40}
+      RABBIT_STEW: {worth: 0.80}
+      BEETROOT_SOUP: {worth: 0.30}
+      GLOW_BERRIES: {worth: 0.10}

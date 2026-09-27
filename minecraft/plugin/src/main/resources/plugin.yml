@@ -1,0 +1,37 @@
+name: NetheriteMarket
+version: ${version}
+main: cloud.alistair.market.MarketPlugin
+api-version: '26.2'
+description: Economy, server shop, player market, and real stock prices.
+author: alii
+
+commands:
+  balance:
+    description: Show your balance.
+    aliases: [bal, money]
+  pay:
+    description: Send money to another player.
+  shop:
+    description: Server shop. Sell what you gather, buy basics.
+  sell:
+    description: Sell to the server shop.
+  worth:
+    description: What the item in your hand sells for.
+  stock:
+    description: Look up, buy and sell real stocks.
+    aliases: [stocks]
+  portfolio:
+    description: Show your stock holdings.
+    aliases: [pf]
+  baltop:
+    description: Richest players by net worth.
+  market:
+    description: Player item market.
+    aliases: [ah]
+  eco:
+    description: Admin money tools.
+    permission: netherite.admin
+
+permissions:
+  netherite.admin:
+    default: op

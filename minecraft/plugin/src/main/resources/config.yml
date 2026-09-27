@@ -1,0 +1,56 @@
+# Money is in-game dollars only. It never turns back into items except by buying from a shop.
+
+# Given once, the first time someone joins.
+starting-balance: 100.00
+
+# Server shop (/shop, /sell). Prices live in shop.yml.
+# Buying from the server costs this many times what selling pays. Keeps people from flipping.
+buy-multiplier: 3.0
+# Selling lowers an item's price for everyone; it recovers over time.
+# After this many dollars' worth of one item is sold, its price is cut in half...
+saturation-dollars: 2000
+# ...and that pressure halves every this many hours.
+recovery-half-life-hours: 24
+
+# Percent taken on every stock buy and sell. Stops spam-flipping.
+trade-fee-percent: 1.0
+
+# Percent taken from the seller on every player /market sale.
+market-fee-percent: 2.0
+
+# Only allow stock trades while the real market is open (NYSE/Nasdaq hours).
+market-hours-only: false
+
+# How long a price is reused before asking Yahoo again.
+quote-cache-seconds: 60
+
+# Which kinds of tickers can be traded.
+allowed-types: [EQUITY, ETF]
+
+# No penny stocks.
+min-price: 5.00
+
+# Leveraged / volatility products that would make people rich (or broke) too fast.
+blocked-symbols:
+  - TQQQ
+  - SQQQ
+  - SOXL
+  - SOXS
+  - UPRO
+  - SPXU
+  - SPXL
+  - SPXS
+  - TNA
+  - TZA
+  - LABU
+  - LABD
+  - UVXY
+  - SVXY
+  - VXX
+  - NVDL
+  - TSLL
+  - MSTU
+  - MSTX
+  - CONL
+
+max-listings-per-player: 27
