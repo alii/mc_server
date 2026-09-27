@@ -19,12 +19,18 @@ import org.bukkit.entity.Player;
 
 /** /stock and /portfolio. Prices are real; the money is not. */
 public final class StockCommands implements TabExecutor {
-    private static final String USAGE = "Usage: /stock <TICKER> | /stock buy <TICKER> <shares|$amount> | /stock sell <TICKER> <shares|all>";
+    private static final String USAGE = "Usage: /stock | /stock <TICKER> | /stock buy <TICKER> <shares|$amount> | /stock sell <TICKER> <shares|all>";
 
     private final MarketPlugin plugin;
+    private final StockMenu menu;
 
     public StockCommands(MarketPlugin plugin) {
         this.plugin = plugin;
+        this.menu = new StockMenu(plugin, this);
+    }
+
+    public StockMenu menu() {
+        return menu;
     }
 
     @Override
@@ -33,7 +39,11 @@ public final class StockCommands implements TabExecutor {
             portfolio(sender, args);
             return true;
         }
-        if (args.length == 1) {
+        if (args.length == 0 && sender instanceof Player p) {
+            menu.openHome(p);
+        } else if (args.length == 1 && sender instanceof Player p) {
+            menu.openTrade(p, args[0]);
+        } else if (args.length == 1) {
             withQuote(sender, args[0], q -> showQuote(sender, q));
         } else if (args.length == 3 && args[0].equalsIgnoreCase("buy") && sender instanceof Player p) {
             withQuote(sender, args[1], q -> buy(p, q, args[2]));
@@ -46,7 +56,7 @@ public final class StockCommands implements TabExecutor {
     }
 
     /** Fetches off-thread, then runs {@code then} back on the main thread. */
-    private void withQuote(CommandSender sender, String symbol, Consumer<PriceService.Quote> then) {
+    void withQuote(CommandSender sender, String symbol, Consumer<PriceService.Quote> then) {
         plugin.prices().quote(symbol).whenComplete((q, err) -> plugin.sync(() -> {
             if (err == null) {
                 then.accept(q);
@@ -81,7 +91,7 @@ public final class StockCommands implements TabExecutor {
         return true;
     }
 
-    private void buy(Player p, PriceService.Quote q, String amountArg) {
+    void buy(Player p, PriceService.Quote q, String amountArg) {
         if (!tradingAllowed(p, q)) return;
         long micros;
         if (amountArg.startsWith("$")) {
@@ -124,16 +134,9 @@ public final class StockCommands implements TabExecutor {
     }
 
     private void sell(Player p, PriceService.Quote q, String amountArg) {
-        if (!tradingAllowed(p, q)) return;
-        var held = plugin.db().holding(p.getUniqueId(), q.symbol());
-        if (held.isEmpty()) {
-            Msg.err(p, "You don't own any <s>.", Msg.v("s", q.symbol()));
-            return;
-        }
-        Db.Holding h = held.get();
         long micros;
         if (amountArg.equalsIgnoreCase("all")) {
-            micros = h.micros();
+            micros = Long.MAX_VALUE;
         } else {
             OptionalLong shares = Money.parseShares(amountArg);
             if (shares.isEmpty()) {
@@ -141,6 +144,23 @@ public final class StockCommands implements TabExecutor {
                 return;
             }
             micros = shares.getAsLong();
+        }
+        sell(p, q, micros);
+    }
+
+    /** Sells {@code micros} shares, or everything if it's {@code Long.MAX_VALUE}. */
+    void sell(Player p, PriceService.Quote q, long micros) {
+        if (!tradingAllowed(p, q)) return;
+        var held = plugin.db().holding(p.getUniqueId(), q.symbol());
+        if (held.isEmpty()) {
+            Msg.err(p, "You don't own any <s>.", Msg.v("s", q.symbol()));
+            return;
+        }
+        Db.Holding h = held.get();
+        if (micros == Long.MAX_VALUE) micros = h.micros();
+        if (micros < 1) {
+            Msg.err(p, "That's too small to sell.");
+            return;
         }
         if (micros > h.micros()) {
             Msg.err(p, "You only have <n> <s>.", Msg.v("n", Money.shares(h.micros())), Msg.v("s", q.symbol()));
@@ -201,7 +221,7 @@ public final class StockCommands implements TabExecutor {
         }));
     }
 
-    private static Component pnl(long cents) {
+    static Component pnl(long cents) {
         String s = (cents >= 0 ? "+" : "-") + Money.format(Math.abs(cents));
         return Msg.mm(cents >= 0 ? "<green><v>" : "<red><v>", Msg.v("v", s));
     }

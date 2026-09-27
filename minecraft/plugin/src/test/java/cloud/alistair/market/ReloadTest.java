@@ -33,6 +33,17 @@ class ReloadTest extends PluginTest {
     }
 
     @Test
+    void oldConfigsGetNewSettingsFilledIn() throws Exception {
+        File file = new File(plugin.getDataFolder(), "config.yml");
+        YamlConfiguration old = YamlConfiguration.loadConfiguration(file);
+        old.set("popular-stocks", null);
+        old.save(file);
+        plugin.reload();
+        assertTrue(plugin.settings().popularStocks().containsKey("AAPL"));
+        assertTrue(YamlConfiguration.loadConfiguration(file).contains("popular-stocks"));
+    }
+
+    @Test
     void reloadIsAdminOnly() {
         PlayerMock p = player("steve");
         assertFalse(run(p, "smp reload").contains("Reloaded"));

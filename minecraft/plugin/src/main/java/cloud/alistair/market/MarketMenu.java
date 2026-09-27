@@ -176,7 +176,7 @@ public final class MarketMenu implements TabExecutor, Listener {
         }
     }
 
-    private static ItemStack button(Material m, String name, String... lore) {
+    static ItemStack button(Material m, String name, String... lore) {
         ItemStack s = new ItemStack(m);
         s.editMeta(meta -> {
             meta.displayName(plain(Msg.mm(name)));
@@ -185,7 +185,7 @@ public final class MarketMenu implements TabExecutor, Listener {
         return s;
     }
 
-    private static Component plain(Component c) {
+    static Component plain(Component c) {
         return c.decoration(TextDecoration.ITALIC, false);
     }
 

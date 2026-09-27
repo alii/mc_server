@@ -1,8 +1,12 @@
 package cloud.alistair.market;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public record Settings(
@@ -17,7 +21,8 @@ public record Settings(
         Set<String> allowedTypes,
         long minPriceCents,
         Set<String> blockedSymbols,
-        int maxListingsPerPlayer) {
+        int maxListingsPerPlayer,
+        Map<String, Material> popularStocks) {
 
     public static Settings from(FileConfiguration c) {
         return new Settings(
@@ -32,7 +37,19 @@ public record Settings(
                 upper(c.getStringList("allowed-types")),
                 Math.round(c.getDouble("min-price") * 100),
                 upper(c.getStringList("blocked-symbols")),
-                c.getInt("max-listings-per-player"));
+                c.getInt("max-listings-per-player"),
+                popular(c.getConfigurationSection("popular-stocks")));
+    }
+
+    /** Ticker to icon, in config order. Unknown items fall back to paper. */
+    private static Map<String, Material> popular(ConfigurationSection sec) {
+        Map<String, Material> out = new LinkedHashMap<>();
+        if (sec == null) return out;
+        for (String symbol : sec.getKeys(false)) {
+            Material m = Material.matchMaterial(sec.getString(symbol, ""));
+            out.put(PriceService.normalize(symbol), m != null && m.isItem() ? m : Material.PAPER);
+        }
+        return out;
     }
 
     private static Set<String> upper(Iterable<String> in) {

@@ -18,6 +18,30 @@ trade-fee-percent: 1.0
 # Percent taken from the seller on every player /market sale.
 market-fee-percent: 2.0
 
+# Shown in the /stock menu, in this order: ticker and the item it's drawn as. Up to 21.
+popular-stocks:
+  SPY: BEACON
+  QQQ: NETHER_STAR
+  AAPL: APPLE
+  MSFT: GLASS_PANE
+  NVDA: EMERALD
+  GOOGL: COMPASS
+  AMZN: CHEST
+  META: ENDER_EYE
+  TSLA: LIGHTNING_ROD
+  NFLX: PAINTING
+  AMD: REDSTONE
+  PLTR: SPYGLASS
+  JPM: GOLD_INGOT
+  V: MAP
+  COST: BARREL
+  KO: HONEY_BOTTLE
+  MCD: BREAD
+  SBUX: COCOA_BEANS
+  NKE: LEATHER_BOOTS
+  DIS: FIREWORK_ROCKET
+  UBER: MINECART
+
 # Only allow stock trades while the real market is open (NYSE/Nasdaq hours).
 market-hours-only: false
 

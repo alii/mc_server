@@ -19,7 +19,7 @@ public class MarketPlugin extends JavaPlugin {
             return;
         }
         saveDefaultConfig();
-        settings = Settings.from(getConfig());
+        settings = loadSettings();
         getDataFolder().mkdirs();
         try {
             db = new Db(new File(getDataFolder(), "market.db"));
@@ -38,6 +38,7 @@ public class MarketPlugin extends JavaPlugin {
         StockCommands stocks = new StockCommands(this);
         bind("stock", stocks);
         bind("portfolio", stocks);
+        getServer().getPluginManager().registerEvents(stocks.menu(), this);
         MarketMenu market = new MarketMenu(this);
         bind("market", market);
         getServer().getPluginManager().registerEvents(market, this);
@@ -73,11 +74,18 @@ public class MarketPlugin extends JavaPlugin {
         return false;
     }
 
+    /** Adds settings from newer versions to an older config.yml, keeping what's already set. */
+    private Settings loadSettings() {
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+        return Settings.from(getConfig());
+    }
+
     /** Re-reads config.yml and shop.yml. Code changes still need a restart. */
     public void reload() {
         ShopMenu.closeAll(getServer());
         reloadConfig();
-        settings = Settings.from(getConfig());
+        settings = loadSettings();
         prices = new PriceService(settings);
         catalog = ShopCatalog.load(new File(getDataFolder(), "shop.yml"), getLogger());
     }

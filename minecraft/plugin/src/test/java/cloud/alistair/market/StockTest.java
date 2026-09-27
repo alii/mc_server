@@ -12,18 +12,20 @@ class StockTest extends PluginTest {
     }
 
     @Test
-    void quoteShowsTheRealPrice() {
+    void quoteOpensTheTradeScreen() {
         PlayerMock p = player("steve");
         price("AAPL", 341.07);
-        String out = run(p, "stock AAPL");
-        assertTrue(out.contains("AAPL") && out.contains("$341.07"), out);
+        run(p, "stock AAPL");
+        String info = StockMenuTest.text(p.getOpenInventory().getTopInventory().getItem(StockMenu.INFO));
+        assertTrue(info.contains("AAPL") && info.contains("$341.07"), info);
     }
 
     @Test
     void lowercaseAndDollarSignWork() {
         PlayerMock p = player("steve");
         price("AAPL", 341.07);
-        assertTrue(run(p, "stock $aapl").contains("$341.07"));
+        run(p, "stock $aapl");
+        assertTrue(StockMenuTest.text(p.getOpenInventory().getTopInventory().getItem(StockMenu.INFO)).contains("$341.07"));
     }
 
     @Test
