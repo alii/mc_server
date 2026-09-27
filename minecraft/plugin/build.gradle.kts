@@ -21,7 +21,27 @@ dependencies {
     testRuntimeOnly("org.xerial:sqlite-jdbc:3.53.4.0")
 }
 
+// Everything except the loader. /smp reload swaps this in without a server restart.
+val coreJar by tasks.registering(Jar::class) {
+    archiveFileName.set("core.jar")
+    destinationDirectory.set(layout.buildDirectory.dir("core"))
+    from(sourceSets.main.get().output) {
+        exclude("cloud/alistair/smp/loader/**", "plugin.yml")
+    }
+}
+
+// The loader: what Paper loads. Only needs replacing (and a restart) when commands change.
+tasks.jar {
+    exclude("cloud/alistair/market/**", "config.yml", "shop.yml")
+}
+
+tasks.assemble {
+    dependsOn(coreJar)
+}
+
 tasks.test {
+    dependsOn(coreJar)
+    systemProperty("smp.coreJar", coreJar.get().archiveFile.get().asFile.absolutePath)
     // Same Java as the server. Byte Buddy (inside MockBukkit) can't make its proxies on 26+.
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(25)) })
     useJUnitPlatform()

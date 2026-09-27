@@ -1,6 +1,6 @@
 name: SmpPlugin
 version: ${version}
-main: cloud.alistair.market.MarketPlugin
+main: cloud.alistair.smp.loader.SmpLoader
 api-version: '26.2'
 description: Everything custom on the SMP. Economy, shop, player market, and real stock prices.
 author: alii
@@ -32,7 +32,7 @@ commands:
     description: Admin money tools.
     permission: smp.admin
   smp:
-    description: Admin tools. /smp reload re-reads config.yml and shop.yml.
+    description: Admin tools. /smp reload swaps in new code, config and shop prices without a restart.
     permission: smp.admin
 
 permissions:

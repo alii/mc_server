@@ -20,9 +20,9 @@ import org.bukkit.inventory.ItemStack;
 
 /** /balance /pay /baltop /eco */
 public final class EconomyCommands implements TabExecutor {
-    private final MarketPlugin plugin;
+    private final SmpCore plugin;
 
-    public EconomyCommands(MarketPlugin plugin) {
+    public EconomyCommands(SmpCore plugin) {
         this.plugin = plugin;
     }
 

@@ -47,6 +47,8 @@ services:
       - ./config:/config:ro
       # our plugin: build it first with `cd plugin && ./gradlew build`
       - ./plugin/build/libs:/plugins:ro
+      # ...and its code, which `/smp reload` swaps in without a restart
+      - ./plugin/build/core:/data/plugins/SmpPlugin/core:ro
 
   backups:
     image: itzg/mc-backup

@@ -61,18 +61,10 @@ public final class ShopMenu implements TabExecutor, Listener {
 
     static final int SELLBOX_CANCEL = 48, SELLBOX_TOTAL = 49, SELLBOX_CONFIRM = 50;
 
-    private final MarketPlugin plugin;
+    private final SmpCore plugin;
 
-    public ShopMenu(MarketPlugin plugin) {
+    public ShopMenu(SmpCore plugin) {
         this.plugin = plugin;
-    }
-
-    /** Open menus point at categories by index, which a reload can shift. */
-    public static void closeAll(org.bukkit.Server server) {
-        for (Player p : server.getOnlinePlayers()) {
-            Inventory top = p.getOpenInventory().getTopInventory();
-            if (top != null && (top.getHolder() instanceof View || top.getHolder() instanceof SellBox)) p.closeInventory();
-        }
     }
 
     // --- pricing ---

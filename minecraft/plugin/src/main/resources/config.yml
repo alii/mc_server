@@ -78,3 +78,13 @@ blocked-symbols:
   - CONL
 
 max-listings-per-player: 27
+
+# A tip in chat every this many minutes, going through the list in order. 0 turns them off.
+tip-interval-minutes: 15
+tips:
+  - "Use <white>/shop</white> to buy and sell items with the server."
+  - "Use <white>/sell all</white> to sell your whole inventory. Click things to keep them first."
+  - "Use <white>/market</white> to buy and sell items with other players."
+  - "Use <white>/stock</white> to invest your money in real stocks."
+  - "Use <white>/pay</white> to send money to a friend."
+  - "See who's richest with <white>/baltop</white>."

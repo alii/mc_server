@@ -16,14 +16,16 @@ import org.mockbukkit.mockbukkit.entity.PlayerMock;
 /** Boots a fake Paper server with the plugin loaded and Yahoo replaced by canned prices. */
 abstract class PluginTest {
     protected ServerMock server;
-    protected MarketPlugin plugin;
+    protected cloud.alistair.smp.loader.SmpLoader loader;
+    protected SmpCore plugin;
     /** symbol -> raw Yahoo JSON. Missing symbols get Yahoo's "not found" reply. */
     protected final Map<String, String> yahoo = new HashMap<>();
 
     @BeforeEach
     void boot() {
         server = MockBukkit.mock();
-        plugin = MockBukkit.load(MarketPlugin.class);
+        loader = MockBukkit.load(cloud.alistair.smp.loader.SmpLoader.class);
+        plugin = (SmpCore) loader.core();
         freshPrices();
     }
 

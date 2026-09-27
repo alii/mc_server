@@ -44,9 +44,9 @@ public final class MarketMenu implements TabExecutor, Listener {
         }
     }
 
-    private final MarketPlugin plugin;
+    private final SmpCore plugin;
 
-    public MarketMenu(MarketPlugin plugin) {
+    public MarketMenu(SmpCore plugin) {
         this.plugin = plugin;
     }
 

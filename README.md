@@ -29,9 +29,13 @@ docker exec mc rcon-cli chunky start
 
 ## Update the plugin
 
+No restart needed:
+
 ```sh
-(cd plugin && ./gradlew build) && docker compose restart mc
+(cd plugin && ./gradlew build) && docker exec mc rcon-cli smp reload
 ```
+
+The plugin is two jars. `build/libs/smp-plugin-*.jar` is a small loader that Paper loads once; `build/core/core.jar` is everything else, and `/smp reload` swaps it in live (code, `config.yml` and `shop.yml`). If the new core fails to start, the old one keeps running. Adding a new command to `plugin.yml` is the one change that still needs `docker compose restart mc`.
 
 ## Tests
 
@@ -56,9 +60,9 @@ Integration tests run the real plugin inside [MockBukkit](https://github.com/Moc
 | `/portfolio [player]` | Holdings and profit/loss |
 | `/market`, `/market sell <price>`, `/market mine` | Player item shop |
 | `/eco give\|take\|set <player> <amount>` | Admin |
-| `/smp reload` | Admin: re-read `config.yml` and `shop.yml` |
+| `/smp reload` | Admin: load new plugin code, `config.yml` and `shop.yml` without a restart |
 
-Prices and tuning are in the plugin's [`config.yml`](minecraft/plugin/src/main/resources/config.yml) and [`shop.yml`](minecraft/plugin/src/main/resources/shop.yml), written to `data/plugins/SmpPlugin/` on first start. Edit them there and run `/smp reload`; no restart needed. Code changes still need a restart.
+Prices and tuning are in the plugin's [`config.yml`](minecraft/plugin/src/main/resources/config.yml) and [`shop.yml`](minecraft/plugin/src/main/resources/shop.yml), written to `data/plugins/SmpPlugin/` on first start. Edit them there and run `/smp reload`. Chat tips (every 15 minutes) are in `config.yml` too.
 
 ## How the shop stays fair
 

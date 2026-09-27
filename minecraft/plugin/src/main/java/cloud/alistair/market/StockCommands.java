@@ -21,10 +21,10 @@ import org.bukkit.entity.Player;
 public final class StockCommands implements TabExecutor {
     private static final String USAGE = "Usage: /stock | /stock <TICKER> | /stock buy <TICKER> <shares|$amount> | /stock sell <TICKER> <shares|all>";
 
-    private final MarketPlugin plugin;
+    private final SmpCore plugin;
     private final StockMenu menu;
 
-    public StockCommands(MarketPlugin plugin) {
+    public StockCommands(SmpCore plugin) {
         this.plugin = plugin;
         this.menu = new StockMenu(plugin, this);
     }

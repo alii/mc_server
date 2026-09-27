@@ -58,12 +58,12 @@ public final class StockMenu implements Listener {
         }
     }
 
-    private final MarketPlugin plugin;
+    private final SmpCore plugin;
     private final StockCommands trades;
     /** Players we asked to type a ticker, and when. */
     private final Map<UUID, Long> searching = new ConcurrentHashMap<>();
 
-    public StockMenu(MarketPlugin plugin, StockCommands trades) {
+    public StockMenu(SmpCore plugin, StockCommands trades) {
         this.plugin = plugin;
         this.trades = trades;
     }

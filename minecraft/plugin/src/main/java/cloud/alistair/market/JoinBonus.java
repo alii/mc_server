@@ -6,9 +6,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 /** Everyone gets the starting balance once, the first time they join. */
 public final class JoinBonus implements Listener {
-    private final MarketPlugin plugin;
+    private final SmpCore plugin;
 
-    public JoinBonus(MarketPlugin plugin) {
+    public JoinBonus(SmpCore plugin) {
         this.plugin = plugin;
     }
 

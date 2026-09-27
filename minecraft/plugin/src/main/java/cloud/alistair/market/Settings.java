@@ -2,6 +2,7 @@ package cloud.alistair.market;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,9 @@ public record Settings(
         long minPriceCents,
         Set<String> blockedSymbols,
         int maxListingsPerPlayer,
-        Map<String, Material> popularStocks) {
+        Map<String, Material> popularStocks,
+        int tipIntervalMinutes,
+        List<String> tips) {
 
     public static Settings from(FileConfiguration c) {
         return new Settings(
@@ -38,7 +41,9 @@ public record Settings(
                 Math.round(c.getDouble("min-price") * 100),
                 upper(c.getStringList("blocked-symbols")),
                 c.getInt("max-listings-per-player"),
-                popular(c.getConfigurationSection("popular-stocks")));
+                popular(c.getConfigurationSection("popular-stocks")),
+                c.getInt("tip-interval-minutes"),
+                List.copyOf(c.getStringList("tips")));
     }
 
     /** Ticker to icon, in config order. Unknown items fall back to paper. */
